@@ -17,7 +17,7 @@ Rules:
 """
     try:
         response = completion(
-            model="gemini/gemini-pro",
+            model="gemini/gemini-2.0-flash",
             api_key=os.getenv("GEMINI_API_KEY"),
             messages=[{"role": "user", "content": dev_prompt}],
             temperature=0.2
