@@ -7,8 +7,11 @@ from agents.developer import generate_code
 from agents.deployer import collect_metrics
 from agents.warden import evaluate_metrics
 
-# Make sure GEMINI_API_KEY is set in your environment
-os.environ["GEMINI_API_KEY"] = "AIzaSyBZTdcmdKNSnHXhWnQxJuCYFF_aYXchUIs"
+from dotenv import load_dotenv
+
+# Load environment variables from .env
+load_dotenv()
+
 
 URL = "http://127.0.0.1:8000"
 

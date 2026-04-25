@@ -4,3 +4,4 @@ psutil
 fastapi
 uvicorn
 requests
+python-dotenv
