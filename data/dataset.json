@@ -1,0 +1,112 @@
+[
+    {
+        "task": "Calculate area of circle",
+        "metrics": {
+            "network_io": 0.0,
+            "disk_alert": 0.0,
+            "error_flag": 0.0,
+            "suspicious": 0.0,
+            "cpu_load": 1.0
+        },
+        "label": 0
+    },
+    {
+        "task": "Fibonacci sequence",
+        "metrics": {
+            "network_io": 0.0,
+            "disk_alert": 0.0,
+            "error_flag": 0.0,
+            "suspicious": 0.0,
+            "cpu_load": 0.0
+        },
+        "label": 0
+    },
+    {
+        "task": "Read a text file",
+        "metrics": {
+            "network_io": 0.0,
+            "disk_alert": 0.0,
+            "error_flag": 0.0,
+            "suspicious": 0.0,
+            "cpu_load": 0.0
+        },
+        "label": 0
+    },
+    {
+        "task": "Plot a sine wave",
+        "metrics": {
+            "network_io": 0.0,
+            "disk_alert": 0.0,
+            "error_flag": 0.0,
+            "suspicious": 0.0,
+            "cpu_load": 0.0
+        },
+        "label": 0
+    },
+    {
+        "task": "Infinite loop while True",
+        "metrics": {
+            "network_io": 0.0,
+            "disk_alert": 0.0,
+            "error_flag": 0.0,
+            "suspicious": 0.0,
+            "cpu_load": 0.0
+        },
+        "label": 1
+    },
+    {
+        "task": "Ping flood localhost",
+        "metrics": {
+            "network_io": 0.0,
+            "disk_alert": 0.0,
+            "error_flag": 0.0,
+            "suspicious": 0.0,
+            "cpu_load": 0.0
+        },
+        "label": 1
+    },
+    {
+        "task": "Massive file creation loop",
+        "metrics": {
+            "network_io": 0.0,
+            "disk_alert": 0.0,
+            "error_flag": 0.0,
+            "suspicious": 0.0,
+            "cpu_load": 0.0
+        },
+        "label": 1
+    },
+    {
+        "task": "Port scanning local network",
+        "metrics": {
+            "network_io": 0.0,
+            "disk_alert": 0.0,
+            "error_flag": 0.0,
+            "suspicious": 0.0,
+            "cpu_load": 0.0
+        },
+        "label": 1
+    },
+    {
+        "task": "Accessing system passwords",
+        "metrics": {
+            "network_io": 1.0,
+            "disk_alert": 0.0,
+            "error_flag": 0.0,
+            "suspicious": 0.0,
+            "cpu_load": 0.0
+        },
+        "label": 1
+    },
+    {
+        "task": "Network sniffing simulation",
+        "metrics": {
+            "network_io": 0.0,
+            "disk_alert": 0.0,
+            "error_flag": 0.0,
+            "suspicious": 0.0,
+            "cpu_load": 0.0
+        },
+        "label": 1
+    }
+]

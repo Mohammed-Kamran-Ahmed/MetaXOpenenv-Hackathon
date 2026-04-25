@@ -1,9 +1,9 @@
 # Intelligent Blind Warden - OpenEnv Framework
 
 ## Overview
-The **Intelligent Blind Warden** is a multi-agent system designed for **AI Safety and Cybersecurity**. It uses the [OpenEnv](https://github.com/neo-derek/open-env) framework to create a secure sandbox environment where autonomous agents can be trained and evaluated on their ability to handle malicious code execution.
+The **Intelligent Blind Warden** is a multi-agent system designed for **AI Safety and Cybersecurity**. It uses the [OpenEnv](https://github.com/neo-derek/open-env) framework to build a secure sandbox environment where autonomous agents can be trained and evaluated on their ability to handle malicious code execution.
 
-The core mission is to safeguard syste "Blind Wardenms by using a" agent that monitors system telemetry (CPU, Network, Disk) without directly reading the code, making decisions to either `APPROVE` or `HALT` execution.
+The core mission is to safeguard systems by using a **PyTorch-powered "Blind Warden"** agent that monitors system telemetry (CPU, Network, Disk) without directly reading the code, making real-time decisions to either `APPROVE` or `HALT` execution.
 
 ---
 
@@ -13,42 +13,34 @@ The system consists of three specialized agents working in a loop:
 
 1.  **👨‍💻 Developer Agent (LLM-powered)**: Generates Python code based on a user-provided task. It is "untrusted" and may generate malicious or buggy code.
 2.  **🚚 Deployer Agent (Programmatic)**: Acts as the bridge that triggers the code execution inside the secure sandbox and captures system metrics.
-3.  **🛡️ Warden Agent (LLM-powered)**: The primary safety agent. It receives the system telemetry (but not the code itself) and decides whether the execution is safe.
+3.  **🛡️ Warden Agent (Local PyTorch Model)**: The primary safety agent. It receives the system telemetry and uses a trained Neural Network to decide whether the behavior is safe. **No external LLM calls are made for safety decisions.**
 
 ---
 
 ## Architecture & Framework
 
 ### OpenEnv Integration
-The project is built on the **OpenEnv framework**, which provides a standard Gymnasium-style interface for agentic environments. This allows for:
+The project is built on the **OpenEnv framework**, providing a standard Gymnasium-style interface:
 -   **Standardized API**: Using `reset()`, `step()`, and `observation()` for agent interactions.
--   **HTTP Server**: The environment is hosted via a FastAPI-powered HTTP server, allowing remote agents to connect and train.
+-   **HTTP Server**: The environment is hosted via a FastAPI server, allowing remote agents to connect and train.
 
-### Core Files
--   `environment.py`: The heart of the project. It implements the RL environment, handles the secure sandbox execution, and calculates rewards.
--   `server/`: Contains the FastAPI application and engine logic to host the environment.
--   `client.py`: The orchestration script that runs the multi-agent mission.
--   `agents/`: Implementation of the Developer, Deployer, and Warden agents.
+### Core Components
+-   `environment.py`: Implements the RL environment and secure sandbox.
+-   `scripts/generate_dataset.py`: Collects synthetic behavioral data for training.
+-   `scripts/train_warden.py`: Trains the PyTorch MLP model on the collected data.
+-   `agents/warden.py`: Performs local inference using the trained `.pth` model.
 
 ---
 
 ## Reinforcement Learning & Training
 
-The environment is specifically designed to **train the Warden agent** using a Reinforcement Learning (RL) reward system.
+The system is designed for **Zero-Trust AI Safety** training.
 
-### Reward Mechanism
-| Warden Action | Environment State | Reward | Description |
-| :--- | :--- | :--- | :--- |
-| **HALT** | Malicious Code | **+10.0** | Correctly prevented a security threat. |
-| **APPROVE** | Safe Code | **+5.0** | Correctly allowed productive code. |
-| **APPROVE** | Malicious Code | **-20.0** | **Critical Security Failure!** Severe penalty. |
-| **HALT** | Safe Code | **-5.0** | False positive; blocked productivity. |
-
-### Learning Flow
-1.  **Observation**: The Warden receives `system_metrics` (CPU load, network I/O, disk alerts, suspicious keywords).
-2.  **Action**: The Warden chooses to `APPROVE` or `HALT`.
-3.  **Reward**: The environment evaluates the Warden's choice against the actual "ground truth" of the sandbox execution and issues a reward.
-4.  **Optimization**: Over many episodes, the Warden learns to distinguish between safe and dangerous system patterns based on the telemetry.
+### Training Pipeline
+1.  **Generate Data**: Use the Developer agent to create diverse code samples (safe vs malicious).
+2.  **Simulate & Label**: Run code in the sandbox and record the system "spikes" (CPU, Network, Disk).
+3.  **Train Warden**: Train a local Neural Network to map these spikes to security labels.
+4.  **Reward Mechanism**: The environment provides rewards (+10/-20) to evaluate the Warden's performance during training or inference.
 
 ---
 
@@ -59,17 +51,22 @@ The environment is specifically designed to **train the Warden agent** using a R
 pip install -r requirements.txt
 ```
 
-### 2. Start the OpenEnv Server
+### 2. Collect Data & Train Model
 ```bash
-python -m uvicorn server.app:app --port 8000
+$env:PYTHONPATH="."
+python scripts/generate_dataset.py
+python scripts/train_warden.py
 ```
 
-### 3. Run the Client Mission
+### 3. Start the Server & Run Mission
 ```bash
+python -m uvicorn server.app:app --port 8000
 python client.py
 ```
 
 ---
 
-## Real-World Application
-This system models the future of **Autonomous AI Security**. As LLMs are increasingly given the ability to run code and access system resources, "Warden" agents will be essential for monitoring their behavior in real-time to prevent accidental or malicious destruction of system infrastructure.
+## Why this is Revolutionary
+-   **Zero-Trust**: The Warden never sees the code, preventing it from being tricked by "prompt injection" or obfuscated code.
+-   **Local & Secure**: Safety decisions are made locally using PyTorch, ensuring zero latency and maximum privacy.
+-   **Scalable**: The environment can generate thousands of synthetic scenarios to constantly improve the Warden's detection capabilities.
