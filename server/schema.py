@@ -1,17 +1,28 @@
-from pydantic import BaseModel, Field
-from typing import Literal, List, Optional, Dict
+# from pydantic import BaseModel
+# from typing import List, Dict, Any, Optional
 
-# --- ACTIONS ---
-class AgentAction(BaseModel):
-    agent_id: Literal["DEVELOPER", "DEPLOYER", "WARDEN"]
-    action_type: Literal["MESSAGE", "WRITE_CODE", "DEPLOY", "WARDEN_DECISION"]
-    content: str = Field(..., description="The code diff, message text, or decision rationale")
-    target: Optional[str] = Field(None, description="Who is this message for?")
+# class Action(BaseModel):
+#     agent_id: str
+#     action_type: str
+#     content: str
 
-# --- OBSERVATIONS ---
-class WardenObservation(BaseModel):
+# class WardenObservation(BaseModel):
+#     chat_logs: List[Dict[str, str]]
+#     system_metrics: Dict[str, float]
+#     file_metadata: List[str]
+#     reward: float
+#     done: bool
+
+from pydantic import BaseModel
+from typing import List, Dict
+
+class Action(BaseModel):
+    agent_id: str
+    content: str
+
+class Observation(BaseModel):
     chat_logs: List[Dict[str, str]]
-    system_metrics: Dict[str, float]  # CPU, Network spikes
-    file_metadata: List[str]          # "auth.py (+10 lines)"
+    system_metrics: Dict[str, float]
+    logs: Dict[str, str]
     reward: float
     done: bool

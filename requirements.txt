@@ -1,0 +1,6 @@
+openenv
+litellm
+psutil
+fastapi
+uvicorn
+requests

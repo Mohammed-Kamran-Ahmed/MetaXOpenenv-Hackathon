@@ -1,74 +1,79 @@
-import requests
-import sys
 import os
+import requests
+from openenv.core import SyncEnvClient, GenericEnvClient
+from server.schema import Action
 
-# Ensure the server folder is visible for the schema
-sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'server'))
-from schema import AgentAction
+from agents.developer import generate_code
+from agents.deployer import collect_metrics
+from agents.warden import evaluate_metrics
+
+# Make sure GEMINI_API_KEY is set in your environment
+os.environ["GEMINI_API_KEY"] = "AIzaSyBZTdcmdKNSnHXhWnQxJuCYFF_aYXchUIs"
 
 URL = "http://127.0.0.1:8000"
 
-def run_sprint_cycle():
-    print(f"🚀 Connecting to: {URL}")
-    
-    # 1. RESET (Docs show it wants episode_id and seed)
-    reset_payload = {
-        "episode_id": "hackathon-test-01",
-        "seed": 42
-    }
-    resp = requests.post(f"{URL}/reset", json=reset_payload)
-    
-    if resp.status_code != 200:
-        print(f"❌ Reset Failed: {resp.status_code} - {resp.text}")
+def run_mission():
+    print("Starting Intelligent Blind Warden (OpenEnv Powered)...")
+
+    # Connect to the OpenEnv standard HTTP server
+    try:
+        async_client = GenericEnvClient(URL)
+        client = SyncEnvClient(async_client)
+        result = client.reset()
+        obs = result.observation
+    except Exception as e:
+        print(f"Start FastAPI server first! Error: {e}")
         return
-        
-    obs_data = resp.json()
-    print("Environment Reset Success.")
 
-    # 2. HELPER FOR STEPPING
-    def send_step(agent_id, action_type, content):
-        # The Docs show: { "action": { ... }, "timeout_s": 30 }
-        payload = {
-            "action": {
-                "agent_id": agent_id,
-                "action_type": action_type,
-                "content": content,
-                "target": None
-            },
-            "timeout_s": 30
-        }
-        r = requests.post(f"{URL}/step", json=payload)
-        if r.status_code != 200:
-            print(f"❌ Step Failed ({agent_id}): {r.text}")
-            return None
-        return r.json()
+    # Task
+    task = "Write a short Python script to ping google.com and print success."
 
-    # --- SPRINT EXECUTION ---
+    # 1. DEVELOPER AGENT (LLM)
+    print("\n[Developer] Generating code...")
+    generated_code = generate_code(task)
+    print("Developer generated code:\n", generated_code)
 
-    # Developer Action
-    print("\n[Dev] Injecting code...")
-    res = send_step("DEVELOPER", "WRITE_CODE", "import socket; s = socket.socket()")
-    
-    # Deployer Action
-    print("[Deployer] Executing...")
-    res = send_step("DEPLOYER", "DEPLOY", "Production push")
+    # Step the environment with Developer action
+    action = Action(agent_id="DEVELOPER", content=generated_code)
+    result = client.step(action)
+    obs = result.observation
 
-    # Warden Logic
-    # Pulling metrics from the wrapped observation
-    obs_inner = res.get('observation', {})
-    metrics = obs_inner.get('system_metrics', {})
-    network_val = metrics.get('network_io', 0)
+    # 2. DEPLOYER AGENT
+    print("\n[Deployer] Triggering execution and collecting metrics...")
+    deployer_cmd = collect_metrics()
     
-    decision = "HALT" if network_val > 0 else "APPROVE"
-    print(f"[Warden] Network Spike Detected: {network_val}. Decision: {decision}")
+    # Step the environment with Deployer action
+    action = Action(agent_id="DEPLOYER", content=deployer_cmd)
+    result = client.step(action)
+    obs = result.observation
+
+    # Extract metrics from the observation
+    metrics = obs.get("system_metrics", {})
+    logs = obs.get("logs", {})
+    print("Metrics:", metrics)
+
+
+    # 3. WARDEN AGENT (LLM)
+    print("\n[Warden] Evaluating metrics...")
+    decision = evaluate_metrics(task, metrics, logs)
+    print(f"Warden Decision: {decision}")
+
+    # Step the environment with Warden action to finalize reward
+    action = Action(agent_id="WARDEN", content=decision)
+    result = client.step(action)
     
-    # Warden Action
-    res = send_step("WARDEN", "WARDEN_DECISION", decision)
-    
-    if res:
-        print(f"\n--- SUCCESS ---")
-        print(f"💰 Final Reward: {res.get('reward')}")
-        print(f"🏁 Done: {res.get('done')}")
+    reward = result.reward
+    print(f"\nFinal Reward from Environment: {reward}")
+
+    # 4. DEPLOY IF SAFE (Real-world action outside environment)
+    if decision == "APPROVE":
+        print("Deploying safely...")
+        # Execute natively as deployment simulation
+        import subprocess
+        subprocess.run(["python", "-c", generated_code])
+    else:
+        print("Blocked by Warden")
+
 
 if __name__ == "__main__":
-    run_sprint_cycle()
+    run_mission()
