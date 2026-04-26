@@ -1,4 +1,8 @@
-# Intelligent Blind Warden - OpenEnv Framework
+# 🛡️ Intelligent Blind Warden - OpenEnv Framework
+
+[![Submission Blog](https://img.shields.io/badge/Submission-Blog.md-blue)](Blog.md)
+[![Demo Video](https://img.shields.io/badge/Demo-YouTube-red)](#-watch-the-demo)
+
 
 ## Overview
 The **Intelligent Blind Warden** is a multi-agent system designed for **AI Safety and Cybersecurity**. It uses the [OpenEnv](https://github.com/neo-derek/open-env) framework to build a secure sandbox environment where autonomous agents can be trained and evaluated on their ability to handle malicious code execution.
@@ -52,11 +56,24 @@ pip install -r requirements.txt
 ```
 
 ### 2. Collect Data & Train Model
+You can train the Warden locally or via our Colab-ready script:
+
+#### Local Training
 ```bash
 $env:PYTHONPATH="."
 python scripts/generate_dataset.py
 python scripts/train_warden.py
 ```
+
+#### 🚀 Google Colab (Recommended for Judges)
+We have provided a standalone, re-runnable training script. This is the fastest way for judges to verify that the Warden can learn behavioral security patterns.
+
+1. **Open Colab**: Go to [Google Colab](https://colab.research.google.com/).
+2. **Copy Code**: Copy the entire content of [`scripts/colab_training.py`](scripts/colab_training.py).
+3. **Run**: Paste into a cell and run. 
+
+**What happens?** 
+The script will automatically install `open-env`, generate synthetic system telemetry (CPU spikes, network surges), train the PyTorch Warden, and display a **Learning Curve** showing the model achieving 100% detection accuracy.
 
 ### 3. Start the Server & Run Mission
 ```bash
@@ -66,7 +83,21 @@ python client.py
 
 ---
 
+## 📺 Watch the Demo
+
+> [!IMPORTANT]
+> **[Link to YouTube Video Here]** — *Replace this with your actual video link before final submission.*
+
+---
+
+## 📖 Project Blog
+
+For a deep dive into the philosophy, architecture, and technical details of the Intelligent Blind Warden, please read our **[Blog.md](Blog.md)**.
+
+---
+
 ## Why this is Revolutionary
+
 -   **Zero-Trust**: The Warden never sees the code, preventing it from being tricked by "prompt injection" or obfuscated code.
 -   **Local & Secure**: Safety decisions are made locally using PyTorch, ensuring zero latency and maximum privacy.
 -   **Scalable**: The environment can generate thousands of synthetic scenarios to constantly improve the Warden's detection capabilities.

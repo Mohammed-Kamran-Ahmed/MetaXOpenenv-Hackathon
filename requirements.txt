@@ -1,8 +1,11 @@
-openenv
-litellm
-psutil
-fastapi
+streamlit
 uvicorn
-requests
-python-dotenv
+fastapi
 torch
+plotly
+litellm
+python-dotenv
+psutil
+openenv
+numpy
+pandas

@@ -43,6 +43,14 @@ def evaluate_metrics(task: str, metrics: dict, logs: dict = None) -> str:
     Evaluates system metrics using a trained PyTorch model.
     Returns "APPROVE" or "HALT".
     """
+    # Safety Baseline: If CPU and Network are nearly zero, it's inherently safe
+    cpu = metrics.get("cpu_load", 0.0)
+    net = metrics.get("network_io", 0.0)
+    
+    if cpu < 1.0 and net < 1.0:
+        print("[Warden] Idle system detected. Auto-approving.")
+        return "APPROVE"
+
     load_model()
     
     if _model is None:
